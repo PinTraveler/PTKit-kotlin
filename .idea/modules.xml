@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ptkit/ptkit.iml" filepath="$PROJECT_DIR$/ptkit/ptkit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ptkit-kotlin.iml" filepath="$PROJECT_DIR$/ptkit-kotlin.iml" />
+    </modules>
+  </component>
+</project>
