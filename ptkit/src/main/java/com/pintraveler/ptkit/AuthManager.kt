@@ -7,6 +7,7 @@ import android.util.Log
 import com.pintraveler.ptkit.Observable
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.pintraveler.ptkit.EmptyFieldException
 
 enum class AuthState { AUTHENTICATED, UNAUTHENTICATED, UNINITIALIZED }
 
@@ -35,6 +36,16 @@ open class AuthManager: Observable<AuthState>() {
         }
     }
 
-    fun login(){}
-
+    fun login(email: String, password: String, completion: ((String?) -> Unit)? = null){
+        if(email == "" || password == ""){
+            completion?.invoke("Please fill in email and password")
+            return
+        }
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+                //if(it.)
+                completion?.invoke("")
+            }
+            .addOnFailureListener { completion?.invoke(it.toString()) }
+    }
 }

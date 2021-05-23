@@ -28,8 +28,12 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:25.12.0')
 
     // Firebase dependencies
+    implementation 'com.google.firebase:firebase-core:18.0.2'
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
+
+    //
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
