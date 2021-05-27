@@ -76,5 +76,8 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
             reference.document(withID).set(elem).addOnCompleteListener { completion?.invoke(it.exception) }
     }
 
+    open fun getByID(id: String): T?{
+        return elems.find{ it._id == id }
+    }
     open fun onAllChanges(allChanged: List<T>){}
 }

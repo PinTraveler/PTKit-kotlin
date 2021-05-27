@@ -18,34 +18,26 @@ open class FireViewHolder<T>(inflater: LayoutInflater, private val parent: ViewG
                              private val providedLastBind: ((View) -> Unit)? = null) : RecyclerView.ViewHolder(inflater.inflate(resource, parent, false)){
     protected open val TAG = "PTItemHolder"
 
-    open fun bindEmptyCard(image: Int, text: String, layoutParams: LinearLayout.LayoutParams?, onClick: (() -> Unit)?, onLongClick: (() -> Unit)?, extraVars: Map<String,Any> = mapOf()){
-        if(layoutParams != null)
-            itemView.layoutParams = layoutParams
+    open fun bindEmptyCard(image: Int?, text: String?, onClick: (() -> Unit)?, onLongClick: (() -> Unit)?){
         itemView.setOnClickListener { onClick?.invoke() }
         itemView.setOnLongClickListener { onLongClick?.invoke(); true }
-        itemView.findViewById<ImageView>(R.id.imageView)?.setImageResource(image)
+        image?.let{ itemView.findViewById<ImageView>(R.id.imageView)?.setImageResource(it) }
         itemView.findViewById<TextView>(R.id.placeholderText)?.text = text
     }
 
-    open fun bind(elem: T, layoutParams: LinearLayout.LayoutParams?, onClick: ((T) -> Unit)?, onLongClick: ((T) -> Unit)?, isFirst: Boolean, isLast: Boolean, extraVars: Map<String,Any> = mapOf()){
-        if(layoutParams != null)
-            itemView.layoutParams = layoutParams
+    open fun bind(elem: T, onClick: ((T) -> Unit)?, onLongClick: ((T) -> Unit)?, isFirst: Boolean, isLast: Boolean){
         providedBind?.invoke(elem, itemView)
         itemView.setOnClickListener { onClick?.invoke(elem) }
         itemView.setOnLongClickListener { onLongClick?.invoke(elem); true }
     }
 
-    open fun bindFirstCard(layoutParams: LinearLayout.LayoutParams?, onClick: (() -> Unit)?, onLongClick: (() -> Unit)?, extraVars: Map<String,Any> = mapOf()){
-        if(layoutParams != null)
-            itemView.layoutParams = layoutParams
+    open fun bindFirstCard(onClick: (() -> Unit)?, onLongClick: (() -> Unit)?){
         providedFirstBind?.invoke(itemView)
         itemView.setOnClickListener { onClick?.invoke() }
         itemView.setOnLongClickListener { onLongClick?.invoke(); true }
     }
 
-    open fun bindLastCard(layoutParams: LinearLayout.LayoutParams?, onClick: (() -> Unit)?, onLongClick: (() -> Unit)?, extraVars: Map<String,Any> = mapOf()){
-        if(layoutParams != null)
-            itemView.layoutParams = layoutParams
+    open fun bindLastCard(onClick: (() -> Unit)?, onLongClick: (() -> Unit)?){
         providedLastBind?.invoke(itemView)
         itemView.setOnClickListener { onClick?.invoke() }
         itemView.setOnLongClickListener { onLongClick?.invoke(); true }
@@ -59,21 +51,20 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
                                       private val showEmptyCard: Boolean = false,
                                       private val emptyLayout: Int = R.layout.empty_card,
                                       private val layout: Int = R.layout.empty_card,
-                                      private val emptyOnClick: (() -> Unit)? = null,
-                                      private val emptyOnLongClick: (() -> Unit)? = null,
-                                      private val emptyImage: Int? = R.drawable.abc_ic_star_black_48dp,
-                                      private val emptyText: String? = "Call to Action!",
+                                      protected val emptyOnClick: (() -> Unit)? = null,
+                                      protected val emptyOnLongClick: (() -> Unit)? = null,
+                                      protected val emptyImage: Int? = R.drawable.abc_ic_star_black_48dp,
+                                      protected val emptyText: String? = "Call to Action!",
                                       private val showFirstCard: Boolean = false,
-                                      private val showFirstWhenEmpty: Boolean = true,
-                                      private val firstOnClick: (() -> Unit)? = null,
-                                      private val firstOnLongClick: (() -> Unit)? = null,
+                                      private val showFirstWhenEmpty: Boolean = false,
+                                      protected val firstOnClick: (() -> Unit)? = null,
+                                      protected val firstOnLongClick: (() -> Unit)? = null,
                                       private val showLastCard: Boolean = false,
-                                      private val showLastWhenEmpty: Boolean = true,
-                                      private val lastOnClick: (() -> Unit)? = null,
-                                      private val lastOnLongClick: (() -> Unit)? = null,
+                                      private val showLastWhenEmpty: Boolean = false,
+                                      protected val lastOnClick: (() -> Unit)? = null,
+                                      protected val lastOnLongClick: (() -> Unit)? = null,
                                       protected var onClick: ((T, Int) -> Unit)? = null,
                                       protected var onLongClick: ((T, Int) -> Unit)? = null,
-                                      private val layoutParams: LinearLayout.LayoutParams? = null,
                                       private var bindFirst: ((View) -> Unit)? = null,
                                       private var bindLast: ((View) -> Unit)? = null,
                                       private var bind: ((T, View) -> Unit)? = null,
@@ -96,13 +87,15 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
         get() = elems.size == 0 && managerCount == 0
 
     protected open val emptyCount
-    get() = showFirstWhenEmpty.compareTo(false) + showLastWhenEmpty.compareTo(false)
+    get() = showFirstWhenEmpty.compareTo(false) + showLastWhenEmpty.compareTo(false) + showEmptyCard.compareTo(false)
 
     protected open val count: Int
     get(){
-        if(manager == null)
-            return elems.size
-        return if(managerCount == 0) emptyCount else showFirstCard.compareTo(false) + managerCount + showLastCard.compareTo(false)
+        if(isEmpty)
+            return emptyCount
+        else if(manager == null)
+            return showFirstCard.compareTo(false) + elems.size + showLastCard.compareTo(false)
+        return showFirstCard.compareTo(false) + managerCount + showLastCard.compareTo(false)
     }
 
     init{
@@ -215,23 +208,35 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
         return minOf(c, maxCount) + add
     }
 
+    open fun bindEmptyCardInternal(holder: FireViewHolder<T>){
+        holder.bindEmptyCard(emptyImage, emptyText, emptyOnClick, emptyOnLongClick)
+    }
+
+    open fun bindFirstCardInternal(holder: FireViewHolder<T>){
+        holder.bindFirstCard(firstOnClick, firstOnLongClick)
+    }
+
+    open fun bindLastCardInternal(holder: FireViewHolder<T>){
+        holder.bindLastCard(lastOnClick, lastOnLongClick)
+    }
+
     override fun onBindViewHolder(holder: FireViewHolder<T>, position: Int) {
         if(position == 0 && ((isEmpty && showFirstWhenEmpty) || (!isEmpty && showFirstCard)))
-            holder.bindFirstCard(layoutParams, firstOnClick, lastOnLongClick)
+            bindFirstCardInternal(holder)
         else if(position == 0 && isEmpty && !showFirstWhenEmpty && showEmptyCard)
-            holder.bindEmptyCard(emptyImage!!, emptyText!! ,layoutParams, emptyOnClick, emptyOnLongClick)
+            bindEmptyCardInternal(holder)
         else if(position == 0 && isEmpty && showLastWhenEmpty)
-            holder.bindLastCard(layoutParams, lastOnClick, lastOnLongClick)
+            bindLastCardInternal(holder)
         else if(position == 0 && showFirstCard)
-            holder.bindFirstCard(layoutParams, firstOnClick, firstOnLongClick)
+            bindFirstCardInternal(holder)
         else if(position == 1 && isEmpty && showFirstWhenEmpty && showEmptyCard)
-            holder.bindEmptyCard(emptyImage!!, emptyText!!, layoutParams, emptyOnClick, emptyOnLongClick)
+            bindEmptyCardInternal(holder)
         else if(position == itemCount-1 && ((isEmpty && showLastWhenEmpty) || (!isEmpty && showLastCard)))
-            holder.bindLastCard(layoutParams, lastOnClick, lastOnLongClick)
+            bindLastCardInternal(holder)
         else{
             val index = if((showFirstWhenEmpty && isEmpty) || (showFirstCard && !isEmpty)) position -1 else position
             val elem = if(manager == null) elems[index] else manager.elems[index]
-            holder.bind(elem, layoutParams, {t -> onClick?.invoke(t, position)}, {t -> onLongClick?.invoke(t, position)}, isFirst(index), isLast(index))
+            holder.bind(elem, {t -> onClick?.invoke(t, position)}, {t -> onLongClick?.invoke(t, position)}, isFirst(index), isLast(index))
         }
     }
 
