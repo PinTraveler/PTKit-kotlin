@@ -5,7 +5,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 
-open class FireObjectManager<T>(protected val classT: Class<T>, protected val reference: DocumentReference,
+open class FireObjectManager<T>(protected val classT: Class<T>?, protected val reference: DocumentReference,
                                 override val TAG: String = "ObjectManager"): Observable<T?>() where T: FireObject {
     var data: T? = null
 
@@ -28,6 +28,11 @@ open class FireObjectManager<T>(protected val classT: Class<T>, protected val re
                     Log.w(TAG, "Null snapshot")
                     return@addSnapshotListener
                 }
+                if(classT == null){
+                    onInternalModify(null, null)
+                    return@addSnapshotListener
+                }
+
                 val oldData = data
                 data = snapshot.toObject(classT)
                 initialized = true

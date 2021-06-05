@@ -61,23 +61,25 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
         }
     }
 
-    open fun removeByID(id: String, completion: ((Exception?) -> Unit)? = null){
+    open fun removeByID(id: String, completion: ((Exception?) -> Unit)? = null) {
         reference.document(id).delete().addOnCompleteListener { completion?.invoke(it.exception) }
     }
 
-    open fun removeAt(index: Int, completion: ((Exception?) -> Unit)? = null){
+    open fun removeAt(index: Int, completion: ((Exception?) -> Unit)? = null) {
         removeByID(elems[index]._id, completion)
     }
 
-    open fun insert(elem: T, withID: String? = null, completion: ((Exception?) -> Unit)? = null){
+    open fun insert(elem: T, withID: String? = null, completion: ((Exception?) -> Unit)? = null) {
         if(withID == null)
             reference.add(elem).addOnCompleteListener { completion?.invoke(it.exception) }
         else
             reference.document(withID).set(elem).addOnCompleteListener { completion?.invoke(it.exception) }
     }
 
-    open fun getByID(id: String): T?{
+    open fun getByID(id: String): T? {
         return elems.find{ it._id == id }
     }
+
     open fun onAllChanges(allChanged: List<T>){}
+
 }

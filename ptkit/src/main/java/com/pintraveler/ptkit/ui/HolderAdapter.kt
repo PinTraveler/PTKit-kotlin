@@ -12,6 +12,7 @@ import com.pintraveler.ptkit.CollectionManager
 import com.pintraveler.ptkit.ConflictingParametersException
 import com.pintraveler.ptkit.ObservableEvent
 import com.pintraveler.ptkit.R
+import kotlinx.android.synthetic.main.empty_card.view.*
 
 open class FireViewHolder<T>(inflater: LayoutInflater, private val parent: ViewGroup, resource: Int,
                              private val providedBind: ((T, View) -> Unit)? = null, private val providedFirstBind: ((View) -> Unit)? = null,
@@ -21,8 +22,9 @@ open class FireViewHolder<T>(inflater: LayoutInflater, private val parent: ViewG
     open fun bindEmptyCard(image: Int?, text: String?, onClick: (() -> Unit)?, onLongClick: (() -> Unit)?){
         itemView.setOnClickListener { onClick?.invoke() }
         itemView.setOnLongClickListener { onLongClick?.invoke(); true }
-        image?.let{ itemView.findViewById<ImageView>(R.id.imageView)?.setImageResource(it) }
-        itemView.findViewById<TextView>(R.id.placeholderText)?.text = text
+        image?.let { itemView?.imageView?.setImageResource(it) }
+        itemView?.placeholderText?.text = text
+        Log.i(TAG, "IMAGE $image, text $text")
     }
 
     open fun bind(elem: T, onClick: ((T) -> Unit)?, onLongClick: ((T) -> Unit)?, isFirst: Boolean, isLast: Boolean){
@@ -198,9 +200,12 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
     }
 
     override fun getItemCount(): Int {
+        Log.i(TAG, "ITEM COUNT")
         if(isEmpty) {
+            Log.i(TAG, "EMPTY $emptyCount")
             return emptyCount
         }
+        Log.i(TAG, "Not Empty")
         val add = showFirstCard.compareTo(false) + showLastCard.compareTo(false)
         val c = if(manager == null) elems.size else managerCount
         if(maxCount == 0)
@@ -220,6 +225,11 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
         holder.bindLastCard(lastOnClick, lastOnLongClick)
     }
 
+    open fun bindInternal(holder: FireViewHolder<T>, elem: T, position: Int){
+        val index = if((showFirstWhenEmpty && isEmpty) || (showFirstCard && !isEmpty)) position -1 else position
+        holder.bind(elem, {t -> onClick?.invoke(t, position)}, {t -> onLongClick?.invoke(t, position)}, isFirst(index), isLast(index))
+    }
+
     override fun onBindViewHolder(holder: FireViewHolder<T>, position: Int) {
         if(position == 0 && ((isEmpty && showFirstWhenEmpty) || (!isEmpty && showFirstCard)))
             bindFirstCardInternal(holder)
@@ -236,7 +246,7 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
         else{
             val index = if((showFirstWhenEmpty && isEmpty) || (showFirstCard && !isEmpty)) position -1 else position
             val elem = if(manager == null) elems[index] else manager.elems[index]
-            holder.bind(elem, {t -> onClick?.invoke(t, position)}, {t -> onLongClick?.invoke(t, position)}, isFirst(index), isLast(index))
+            bindInternal(holder, elem, index)
         }
     }
 
@@ -252,8 +262,11 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireViewHolder<T> {
         val inflater = LayoutInflater.from(parent.context)
-        if(viewType == TYPE_EMPTY)
+        if(viewType == TYPE_EMPTY) {
+            Log.i(TAG, "EMPTY VH")
             return FireViewHolder(inflater, parent, emptyLayout)
+        }
+        Log.i(TAG, "REGULAR VH")
         return FireViewHolder(inflater, parent, layout, bind)
     }
 
@@ -261,11 +274,10 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
     open fun getItemAt(i: Int): T?{
         if(isEmpty)
             return null
-        val add = (if(showFirstCard) 1 else 0)
-        val index = i - showFirstCard.compareTo(false)
         if(showFirstCard && i == 0)
             return null
-        else if(manager == null)
+        val index = i - showFirstCard.compareTo(false)
+        if(manager == null)
             return if(index >= elems.size) null else elems[index]
         return if(index >= managerCount) null else manager.elems[index]
     }
