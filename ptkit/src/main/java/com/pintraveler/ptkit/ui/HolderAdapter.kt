@@ -22,8 +22,8 @@ open class FireViewHolder<T>(inflater: LayoutInflater, private val parent: ViewG
     open fun bindEmptyCard(image: Int?, text: String?, onClick: (() -> Unit)?, onLongClick: (() -> Unit)?){
         itemView.setOnClickListener { onClick?.invoke() }
         itemView.setOnLongClickListener { onLongClick?.invoke(); true }
-        image?.let { itemView?.imageView?.setImageResource(it) }
-        itemView?.placeholderText?.text = text
+        image?.let { itemView.imageView?.setImageResource(it) }
+        itemView.placeholderText?.text = text
         Log.i(TAG, "IMAGE $image, text $text")
     }
 

@@ -39,7 +39,7 @@ open class FireObjectManager<T>(protected val classT: Class<T>?, protected val r
                 var modifiedElem: T? = null
                 data?.let{ modifiedElem = elemModBeforeInsertion(it) }
 
-                onInternalModify(oldData, data)
+                onInternalModify(oldData, modifiedElem)
                 //NOTE: The line above is also synchronized but this is not an issue as the sync block of this function
                 //      completes before a callback is invoked
             }
