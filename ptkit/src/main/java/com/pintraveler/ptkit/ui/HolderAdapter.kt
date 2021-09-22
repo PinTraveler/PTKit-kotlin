@@ -55,7 +55,7 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
                                       private val layout: Int = R.layout.empty_card,
                                       protected val emptyOnClick: (() -> Unit)? = null,
                                       protected val emptyOnLongClick: (() -> Unit)? = null,
-                                      protected val emptyImage: Int? = R.drawable.abc_ic_star_black_48dp,
+                                      protected val emptyImage: Int? = R.drawable.ic_launcher_background,//R.drawable.abc_ic_star_black_48dp,
                                       protected val emptyText: String? = "Call to Action!",
                                       private val showFirstCard: Boolean = false,
                                       private val showFirstWhenEmpty: Boolean = false,

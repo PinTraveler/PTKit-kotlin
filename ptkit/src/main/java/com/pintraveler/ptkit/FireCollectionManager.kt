@@ -7,11 +7,16 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 
 open class FireCollectionManager<T>(classT: Class<T>, protected val reference: CollectionReference,
-                                    protected var query: Query = reference, TAG: String):
+                                    protected var query: Query = reference, TAG: String, register: Boolean = false, private val sanityFilter: ((T) -> Boolean) = { true }):
     CollectionManager<T>(classT, TAG) where T: FireObject {
 
     protected var collectionListener: ListenerRegistration? = null
     protected var firestoreInitialized = false
+
+    init {
+        if(register)
+            registerFirestoreListener()
+    }
 
     open fun elemModBeforeInsertion(elem: T): T{
         return elem
@@ -29,7 +34,11 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
                         val elem = it.document.toObject(classT)
                         elem._id = it.document.id
                         val modifiedElem = elemModBeforeInsertion(elem)
+                        if(!sanityFilter(modifiedElem))
+                            return@forEach
+
                         allChanged.add(modifiedElem)
+                        Log.i(TAG, "ADD ${elems.size}")
                         when (it.type) {
                             DocumentChange.Type.ADDED -> onInternalAdd(modifiedElem)
                             DocumentChange.Type.MODIFIED -> onInternalModify(modifiedElem, modifiedElem)
@@ -66,7 +75,13 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
     }
 
     open fun removeAt(index: Int, completion: ((Exception?) -> Unit)? = null) {
+        Log.i(TAG, "REMOVING AT -3- $index ${elems.size} ${elems[index]._id}")
         removeByID(elems[index]._id, completion)
+    }
+
+    // metamorphism.
+    override fun removeAt(index: Int) {
+        removeAt(index, null)
     }
 
     open fun insert(elem: T, withID: String? = null, completion: ((Exception?) -> Unit)? = null) {

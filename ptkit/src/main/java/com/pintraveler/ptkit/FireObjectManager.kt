@@ -5,11 +5,16 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 
-open class FireObjectManager<T>(protected val classT: Class<T>?, protected val reference: DocumentReference,
+open class FireObjectManager<T>(protected val classT: Class<T>?, protected val reference: DocumentReference, register: Boolean = false,
                                 override val TAG: String = "ObjectManager"): Observable<T?>() where T: FireObject {
     var data: T? = null
 
     private var firestoreListener: ListenerRegistration? = null
+
+    init {
+        if(register)
+            registerFirestoreListener()
+    }
 
     override fun getObservableValue(): T? { synchronized(this){ return data } }
 
@@ -29,6 +34,7 @@ open class FireObjectManager<T>(protected val classT: Class<T>?, protected val r
                     return@addSnapshotListener
                 }
                 if(classT == null){
+                    initialized = true
                     onInternalModify(null, null)
                     return@addSnapshotListener
                 }

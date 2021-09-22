@@ -71,7 +71,13 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
         }
     }
 
+    override fun clean() {
+        super.clean()
+        elems = mutableListOf()
+    }
+
     open fun removeAt(index: Int){
+        Log.i(TAG, "REMOVING AT -4- ${index}")
         synchronized(elems) {
             val elem = elems[index]
             elems.removeAt(index)
