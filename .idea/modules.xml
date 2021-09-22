@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PTKit-kotlin.iml" filepath="$PROJECT_DIR$/.idea/modules/PTKit-kotlin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ptkit/PTKit-kotlin.ptkit.iml" filepath="$PROJECT_DIR$/.idea/modules/ptkit/PTKit-kotlin.ptkit.iml" />
       <module fileurl="file://$PROJECT_DIR$/ptkit/ptkit.iml" filepath="$PROJECT_DIR$/ptkit/ptkit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ptkit-kotlin.iml" filepath="$PROJECT_DIR$/ptkit-kotlin.iml" />
     </modules>
   </component>
 </project>

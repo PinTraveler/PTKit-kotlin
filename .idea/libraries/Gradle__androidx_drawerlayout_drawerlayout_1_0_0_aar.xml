@@ -2,10 +2,14 @@
   <library name="Gradle: androidx.drawerlayout:drawerlayout:1.0.0@aar">
     <ANNOTATIONS>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/61c285e85f1b6edc92e049fd1c50826f/annotations.zip!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/25974f3bbcc626a59cc2554a92670ec8/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/61c285e85f1b6edc92e049fd1c50826f/res" />
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/61c285e85f1b6edc92e049fd1c50826f/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/25974f3bbcc626a59cc2554a92670ec8/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/25974f3bbcc626a59cc2554a92670ec8/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/25974f3bbcc626a59cc2554a92670ec8/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
