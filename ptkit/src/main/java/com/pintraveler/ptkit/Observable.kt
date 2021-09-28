@@ -20,8 +20,8 @@ abstract class Observable<T> {
         }
     }
 
-    protected open fun onInternalAdd(after: T){ onAdd(after) }
-    protected open fun onInternalRemove(before: T){ onRemove(before) }
+    protected open fun onInternalAdd(elem: T){ onAdd(elem) }
+    protected open fun onInternalRemove(elem: T){ onRemove(elem) }
     protected open fun onInternalModify(before: T, after: T){ onModify(before, after) }
 
     protected fun onAdd(after: T){ onEvent(ObservableEvent.ADD, null, after) }

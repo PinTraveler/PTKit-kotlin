@@ -64,7 +64,7 @@ open class FireObjectManager<T>(protected val classT: Class<T>?, protected val r
                 Log.e(TAG, "Error Committing Object", it)
                 completion?.invoke(it)
             }
-        } ?: throw NullObjectException("Committing null object")
+        } ?: completion?.invoke(NullObjectException("Committing null object"))
     }
 
     fun deregisterFirestoreListener(){
