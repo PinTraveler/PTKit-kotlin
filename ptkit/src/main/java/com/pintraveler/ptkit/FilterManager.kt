@@ -36,7 +36,6 @@ class FilterManager<T>(classT: Class<T>, private val manager: CollectionManager<
         filterFn = newFilterFn
         elems.toList().forEach {
             if(!filterFn(it)){
-                elems.remove(it)
                 onInternalRemove(it)
                 Log.i(TAG, "Remove")
             }
@@ -44,7 +43,6 @@ class FilterManager<T>(classT: Class<T>, private val manager: CollectionManager<
 
         manager.elems.toList().forEach {
             if(filterFn(it) && !elems.contains(it)){
-                elems.add(it)
                 onInternalAdd(it)
                 Log.i(TAG, "Add")
             }

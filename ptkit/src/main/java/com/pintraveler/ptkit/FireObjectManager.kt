@@ -53,7 +53,7 @@ open class FireObjectManager<T>(protected val classT: Class<T>?, protected val r
     }
 
     fun commit(merge: Boolean = false, completion: ((Exception?) -> Unit)? = null){
-        //NOTE: I don't believe this needs to be synchronized as it doesn't actually set the held data
+        //NOTE: I don't believe this needs to be synchronized as it doesn't actually modify the local data
         data?.let {
             val task = if(merge) reference.set(it as Any, SetOptions.merge()) else reference.set(it as Any)
             task.addOnSuccessListener {
@@ -64,7 +64,7 @@ open class FireObjectManager<T>(protected val classT: Class<T>?, protected val r
                 Log.e(TAG, "Error Committing Object", it)
                 completion?.invoke(it)
             }
-        } ?: throw NullObjectException("Committing null object")
+        } ?: completion?.invoke(NullObjectException("Committing null object"))
     }
 
     fun deregisterFirestoreListener(){
