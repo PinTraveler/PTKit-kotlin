@@ -4,12 +4,18 @@
 package ptkit
 
 import android.util.Log
+import android.view.View
+import android.widget.Toast
+import com.google.firebase.auth.AuthResult
 import com.pintraveler.ptkit.Observable
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.pintraveler.ptkit.EmptyFieldException
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 
 enum class AuthState { AUTHENTICATED, UNAUTHENTICATED, UNINITIALIZED }
+enum class EmailValidaton { INVALID, IN_USE, DIFFERENT_METHOD, VALID }
 
 open class AuthManager: Observable<AuthState>() {
     override val TAG: String = "AuthManager"
@@ -34,6 +40,31 @@ open class AuthManager: Observable<AuthState>() {
             onModify(lastState, state)
             initialized = true
         }
+    }
+
+    fun validateEmail(email: String, completion: (String) -> Unit){
+        if(email == "")
+            completion("Invalid Email")
+        else{
+            FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email)
+                .addOnSuccessListener {
+                    val m = it.signInMethods
+                    if(m == null || m.size == 0) completion("")
+                    else completion("Email already in use")
+                }
+                .addOnFailureListener { completion("Invalid Email") }
+        }
+    }
+
+    suspend fun validateEmail(email: String): EmailValidaton {
+        if(email == "")
+            return EmailValidaton.INVALID
+        lateinit var result: EmailValidaton
+        FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email)
+        .addOnSuccessListener { result = if(it.signInMethods?.isEmpty() ?: true) EmailValidaton.VALID else EmailValidaton.IN_USE }
+        .addOnFailureListener { result = EmailValidaton.INVALID }
+            .await()
+        return result
     }
 
     fun login(email: String, password: String, completion: ((String?) -> Unit)? = null){
