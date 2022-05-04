@@ -10,11 +10,10 @@ repositories {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "29.0.3"
+    compileSdk 32
     defaultConfig {
-        minSdkVersion 26
-        targetSdkVersion 30
+        minSdk 26
+        targetSdk 32
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
