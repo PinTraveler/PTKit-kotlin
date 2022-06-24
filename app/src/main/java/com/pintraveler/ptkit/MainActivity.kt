@@ -1,4 +1,4 @@
-package com.example.ptkit
+package com.pintraveler.ptkit
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

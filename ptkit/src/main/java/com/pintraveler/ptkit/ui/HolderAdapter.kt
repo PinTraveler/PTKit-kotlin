@@ -1,17 +1,14 @@
-package com.example.mylibrary.ui
+package com.pintraveler.ptkit.ui
 
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mylibrary.CollectionManager
-import com.example.mylibrary.ConflictingParametersException
-import com.example.mylibrary.ObservableEvent
-import com.example.mylibrary.R
+import com.pintraveler.ptkit.R
+import com.pintraveler.ptkit.CollectionManager
+import com.pintraveler.ptkit.ConflictingParametersException
+import com.pintraveler.ptkit.ObservableEvent
 
 
 open class FireViewHolder<T>(inflater: LayoutInflater, private val parent: ViewGroup, resource: Int,

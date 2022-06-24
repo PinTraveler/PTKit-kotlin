@@ -1,4 +1,4 @@
-package com.example.ptkit
+package com.pintraveler.ptkit
 
 import org.junit.Test
 

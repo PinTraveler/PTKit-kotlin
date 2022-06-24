@@ -8,6 +8,7 @@ android {
     compileSdk 32
 
     defaultConfig {
+        applicationId "com.pintraveler.ptkit"
         minSdk 21
         targetSdk 32
 
@@ -49,7 +50,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.pintraveler'
                 artifactId = 'ptkit'
-                version = '0.0.1'
+                version = '0.0.2'
             }
         }
     }

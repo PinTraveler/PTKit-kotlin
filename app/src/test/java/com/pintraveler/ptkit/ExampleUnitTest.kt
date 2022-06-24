@@ -1,4 +1,4 @@
-package com.example.mylibrary
+package com.pintraveler.ptkit
 
 import org.junit.Test
 
