@@ -9,7 +9,7 @@ import com.pintraveler.ptkit.R
 import com.pintraveler.ptkit.CollectionManager
 import com.pintraveler.ptkit.ConflictingParametersException
 import com.pintraveler.ptkit.ObservableEvent
-
+import kotlinx.android.synthetic.main.empty_card.view.*
 
 open class FireViewHolder<T>(inflater: LayoutInflater, private val parent: ViewGroup, resource: Int,
                              private val providedBind: ((T, View) -> Unit)? = null, private val providedFirstBind: ((View) -> Unit)? = null,
@@ -19,8 +19,8 @@ open class FireViewHolder<T>(inflater: LayoutInflater, private val parent: ViewG
     open fun bindEmptyCard(image: Int?, text: String?, onClick: (() -> Unit)?, onLongClick: (() -> Unit)?){
         itemView.setOnClickListener { onClick?.invoke() }
         itemView.setOnLongClickListener { onLongClick?.invoke(); true }
-      //  image?.let { itemView.imageView?.setImageResource(it) }
-       // itemView.placeholderText?.text = text
+        image?.let { itemView.imageView?.setImageResource(it) }
+        itemView.placeholderText?.text = text
         Log.i(TAG, "IMAGE $image, text $text")
     }
 
