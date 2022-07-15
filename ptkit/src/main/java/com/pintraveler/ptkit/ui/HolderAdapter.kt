@@ -4,14 +4,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.pintraveler.ptkit.R
 import com.pintraveler.ptkit.CollectionManager
 import com.pintraveler.ptkit.ConflictingParametersException
 import com.pintraveler.ptkit.ObservableEvent
-import com.pintraveler.ptkit.R
 import kotlinx.android.synthetic.main.empty_card.view.*
 
 open class FireViewHolder<T>(inflater: LayoutInflater, private val parent: ViewGroup, resource: Int,
@@ -55,7 +52,7 @@ open class FireRecyclerViewAdapter<T>(protected val manager: CollectionManager<T
                                       private val layout: Int = R.layout.empty_card,
                                       protected val emptyOnClick: (() -> Unit)? = null,
                                       protected val emptyOnLongClick: (() -> Unit)? = null,
-                                      protected val emptyImage: Int? = R.drawable.ic_launcher_background,//R.drawable.abc_ic_star_black_48dp,
+                                      protected val emptyImage: Int? = com.google.android.gms.base.R.drawable.googleg_disabled_color_18,//R.drawable.abc_ic_star_black_48dp,
                                       protected val emptyText: String? = "Call to Action!",
                                       private val showFirstCard: Boolean = false,
                                       private val showFirstWhenEmpty: Boolean = false,
