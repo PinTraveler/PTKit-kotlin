@@ -31,18 +31,25 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
                     firestoreInitialized = true
                     var allChanged = mutableListOf<T>()
                     snap.documentChanges.forEach {
-                        val elem = it.document.toObject(classT)
-                        elem._id = it.document.id
-                        val modifiedElem = elemModBeforeInsertion(elem)
-                        if(!sanityFilter(modifiedElem))
-                            return@forEach
+                        try {
+                            val elem = it.document.toObject(classT)
+                            elem._id = it.document.id
+                            val modifiedElem = elemModBeforeInsertion(elem)
+                            if (!sanityFilter(modifiedElem))
+                                return@forEach
 
-                        allChanged.add(modifiedElem)
-                        Log.i(TAG, "ADD ${elems.size}")
-                        when (it.type) {
-                            DocumentChange.Type.ADDED -> onInternalAdd(modifiedElem)
-                            DocumentChange.Type.MODIFIED -> onInternalModify(modifiedElem, modifiedElem)
-                            DocumentChange.Type.REMOVED -> onInternalRemove(modifiedElem)
+                            allChanged.add(modifiedElem)
+                            Log.i(TAG, "ADD ${elems.size}")
+                            when (it.type) {
+                                DocumentChange.Type.ADDED -> onInternalAdd(modifiedElem)
+                                DocumentChange.Type.MODIFIED -> onInternalModify(
+                                    modifiedElem,
+                                    modifiedElem
+                                )
+                                DocumentChange.Type.REMOVED -> onInternalRemove(modifiedElem)
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error parsing document ${it.document.id}! ${it.document.data}")
                         }
                     }
                     onAllChanges(allChanged)
