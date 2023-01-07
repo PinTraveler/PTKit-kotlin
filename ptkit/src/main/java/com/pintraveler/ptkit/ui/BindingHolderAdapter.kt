@@ -1,23 +1,12 @@
 package com.pintraveler.ptkit.ui
 
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.pintraveler.ptkit.R
 import com.pintraveler.ptkit.CollectionManager
 import com.pintraveler.ptkit.ConflictingParametersException
 import com.pintraveler.ptkit.ObservableEvent
-import com.pintraveler.ptkit.databinding.EmptyCardBinding
-
-class EmptyViewModel() {
-    var imageResource: Int = com.google.android.gms.base.R.drawable.googleg_disabled_color_18
-    var text: String = "Empty Text"
-}
 
 enum class HolderType { EMPTY, ITEM, FIRST, LAST }
 open class FireBindingViewHolder<T>(private val binding: ViewBinding,
@@ -38,13 +27,12 @@ open class FireBindingViewHolder<T>(private val binding: ViewBinding,
 
 open class FireBindingRecyclerViewAdapter<T>(
                                       private val createViewBinding: (ViewGroup) -> ViewBinding,
+                                      private val createEmptyViewBinding: ((ViewGroup) -> ViewBinding)? = null,
                                       protected val manager: CollectionManager<T>? = null,
                                       name: String = "PTRecyclerViewAdapter",
                                       contents: List<T>? = null,
                                       protected val maxCount: Int = 0,
                                       private val showEmptyCard: Boolean = false,
-                                      private val emptyLayout: Int = R.layout.empty_card,
-                                      private val layout: Int = R.layout.empty_card,
                                       protected val emptyImage: Int? = com.google.android.gms.base.R.drawable.googleg_disabled_color_18,//R.drawable.abc_ic_star_black_48dp,
                                       protected val emptyText: String? = "Call to Action!",
                                       private val showFirstCard: Boolean = false,
@@ -245,12 +233,8 @@ open class FireBindingRecyclerViewAdapter<T>(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireBindingViewHolder<T> {
-        val inflater = LayoutInflater.from(parent.context)
-        val bindingLayout = when (viewType) {
-            TYPE_EMPTY -> emptyLayout
-            else -> layout
-        }
-        val binding = createViewBinding(parent)
+        val emptyFN = createEmptyViewBinding ?: createViewBinding
+        val binding = if(viewType == TYPE_EMPTY && createEmptyViewBinding != null) emptyFN(parent) else createViewBinding(parent)
         return FireBindingViewHolder(binding, bind, bindFirst, bindLast, bindEmpty)
     }
 
