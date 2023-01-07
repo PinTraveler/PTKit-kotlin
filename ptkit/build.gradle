@@ -55,7 +55,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.pintraveler'
                 artifactId = 'ptkit'
-                version = '0.1.2'
+                version = '0.1.3'
             }
         }
     }
