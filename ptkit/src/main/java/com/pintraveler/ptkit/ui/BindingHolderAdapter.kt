@@ -172,7 +172,6 @@ open class FireBindingRecyclerViewAdapter<T>(
     }
 
     override fun getItemCount(): Int {
-        Log.i(TAG, "ITEM COUNT")
         if(isEmpty) {
             Log.i(TAG, "EMPTY $emptyCount")
             return emptyCount
@@ -180,9 +179,9 @@ open class FireBindingRecyclerViewAdapter<T>(
         Log.i(TAG, "Not Empty")
         val add = showFirstCard.compareTo(false) + showLastCard.compareTo(false)
         val c = if(manager == null) elems.size else managerCount
-        if(maxCount == 0)
-            return c + add
-        return minOf(c, maxCount) + add
+        val result = if(maxCount == 0) c + add else minOf(c, maxCount) + add
+        Log.i(TAG, "ITEM COUNT $result")
+        return result
     }
 
     open fun bindEmptyCardInternal(holder: FireBindingViewHolder<T>){
@@ -199,10 +198,12 @@ open class FireBindingRecyclerViewAdapter<T>(
 
     open fun bindInternal(holder: FireBindingViewHolder<T>, elem: T, position: Int){
         val index = if((showFirstWhenEmpty && isEmpty) || (showFirstCard && !isEmpty)) position -1 else position
+        Log.i(TAG, "Internal Bind $index")
         holder.bind(elem, index, HolderType.ITEM)
     }
 
     override fun onBindViewHolder(holder: FireBindingViewHolder<T>, position: Int) {
+        Log.i(TAG, "On Bind $position")
         if(position == 0 && ((isEmpty && showFirstWhenEmpty) || (!isEmpty && showFirstCard)))
             bindFirstCardInternal(holder)
         else if(position == 0 && isEmpty && !showFirstWhenEmpty && showEmptyCard)
@@ -233,6 +234,7 @@ open class FireBindingRecyclerViewAdapter<T>(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireBindingViewHolder<T> {
+        Log.i(TAG, "On Create VH")
         val emptyFN = createEmptyViewBinding ?: createViewBinding
         val binding = if(viewType == TYPE_EMPTY && createEmptyViewBinding != null) emptyFN(parent) else createViewBinding(parent)
         return FireBindingViewHolder(binding, bind, bindFirst, bindLast, bindEmpty)
