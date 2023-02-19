@@ -71,7 +71,7 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
         synchronized(elems) {
             val index = insertionIndexOf(after)
             if (index >= elems.size) {
-                Log.d(TAG, "Add $after")
+                Log.d(TAG, "Add (mod) $after")
                 elems.add(index, after)
                 onAdd(after)
             }

@@ -47,7 +47,9 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
                                     allChanged.add(CollectionChange(ObservableEvent.ADD, before, elem))
                                 }
                                 DocumentChange.Type.MODIFIED -> {
-                                    onInternalModify(modifiedElem, modifiedElem)
+                                    if(before == null)
+                                        Log.w(TAG, "BEFORE IS NULL for after $modifiedElem")
+                                    onInternalModify(before ?: modifiedElem, modifiedElem)
                                     allChanged.add(CollectionChange(ObservableEvent.MODIFY, before, elem))
                                 }
                                 DocumentChange.Type.REMOVED -> {
@@ -85,7 +87,11 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
     }
 
     open fun removeByID(id: String, completion: ((Exception?) -> Unit)? = null) {
-        reference.document(id).delete().addOnCompleteListener { completion?.invoke(it.exception) }
+        Log.i(TAG, "Removing by id $id")
+        reference.document(id).delete().addOnCompleteListener {
+            Log.i(TAG, "Remove ${it.isSuccessful} exception ? ${it.exception}")
+            completion?.invoke(it.exception)
+        }
     }
 
     open fun removeAt(index: Int, completion: ((Exception?) -> Unit)? = null) {
