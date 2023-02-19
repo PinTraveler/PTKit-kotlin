@@ -16,6 +16,7 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
     var elems: MutableList<T> = mutableListOf()
 
     fun registerAllChangeListener(name: String, listener: (List<CollectionChange<T>>) -> Unit) {
+        Log.i(TAG, "Registering all listener $name")
         allListeners[name] = listener
         listener(elems.map { CollectionChange(ObservableEvent.ADD, null, it) })
     }

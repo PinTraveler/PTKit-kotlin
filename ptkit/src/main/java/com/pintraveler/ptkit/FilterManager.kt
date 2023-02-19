@@ -4,9 +4,9 @@ import android.util.Log
 
 class FilterManager<T>(classT: Class<T>, private val manager: CollectionManager<T>, val name: String, val limit:Int = 0, var filterFn: ((T) -> Boolean)):
     CollectionManager<T>(classT) where T: Comparable<T>{
-    override val TAG = "FilterManager"
+    override val TAG = "FilterManager$name"
     init {
-        manager.registerListener("FilterManager$name"){ event, b, a ->
+        manager.registerListener(TAG){ event, b, a ->
             var allChanged = mutableListOf<CollectionChange<T>>()
             when(event){
                 ObservableEvent.ADD -> {
