@@ -42,7 +42,8 @@ class FilterManager<T>(classT: Class<T>, private val manager: CollectionManager<
                     }
                 }
             }
-            onAllChanges(allChanged)
+            if(allChanged.isNotEmpty())
+                onAllChanges(allChanged)
         }
     }
 
@@ -64,6 +65,7 @@ class FilterManager<T>(classT: Class<T>, private val manager: CollectionManager<
                 Log.i(TAG, "Add")
             }
         }
-        onAllChanges(allChanged)
+        if(allChanged.isNotEmpty())
+            onAllChanges(allChanged)
     }
 }
