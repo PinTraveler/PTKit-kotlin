@@ -118,6 +118,10 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
     }
 
     open fun onAllChanges(allChanged: List<CollectionChange<T>>) {
+        val add = allChanged.filter { it.event == ObservableEvent.ADD }.size
+        val change = allChanged.filter { it.event == ObservableEvent.MODIFY }.size
+        val remove = allChanged.filter { it.event == ObservableEvent.REMOVE }.size
+        Log.i(TAG, "All Changes: ${allChanged.size} changes $add, $change, $remove")
         allListeners.forEach {
             it.value(allChanged)
         }

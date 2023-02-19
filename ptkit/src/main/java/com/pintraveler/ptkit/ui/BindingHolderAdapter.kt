@@ -81,15 +81,22 @@ open class FireBindingRecyclerViewAdapter<T>(
         }
         contents?.let{ elems = it }
         manager?.registerAllChangeListener(name) { changeList ->
+            val add = changeList.filter { it.event == ObservableEvent.ADD }.size
+            val change = changeList.filter { it.event == ObservableEvent.MODIFY }.size
+            val remove = changeList.filter { it.event == ObservableEvent.REMOVE }.size
+            Log.i(TAG, "Received ${changeList.size} $add, $change, $remove")
             if(!registerIndividualChanges && changeList.size > 3) {
+                Log.i(TAG, "Doing a bulk change")
                 notifyDataSetChanged()
                 return@registerAllChangeListener
             }
             changeList.forEach {
                 var index = if(it.after != null ) manager.insertionIndexOf(it.after) else if(it.before != null) manager.insertionIndexOf(it.before) else 0
                 val maxC = maxCount + if(showFirstCard) 1 else 0
-                if(maxCount > 0 && index >= maxC)
+                if(maxCount > 0 && index >= maxC) {
+                    Log.i(TAG, "Returning for maxcount as $maxCount, $index, $maxC")
                     return@forEach
+                }
                 when(it.event) {
                     ObservableEvent.ADD -> {
                         if(manager.elems.size == 1) { // was empty
@@ -116,6 +123,7 @@ open class FireBindingRecyclerViewAdapter<T>(
                                 notifyItemChanged(if(showFirstCard) 2 else 1) // Replace Last Empty Card with Last Card
                         }
                         else {
+                            Log.i(TAG, "Individual insert")
                             notifyItemInserted(index)
                         }
                     }
@@ -129,7 +137,9 @@ open class FireBindingRecyclerViewAdapter<T>(
                                 notifyItemInserted(0)
                             else
                                 notifyItemChanged(0)
+
                             // Remove Main Card
+                            Log.i(TAG, "Individual remove -empty- $index")
                             notifyItemRemoved(if(showFirstWhenEmpty) 1 else 0)
 
                             // Handle the Last Card
@@ -139,13 +149,16 @@ open class FireBindingRecyclerViewAdapter<T>(
                                 notifyItemInserted(if(showFirstWhenEmpty) 1 else 0) // Add Last Empty Card
                             else
                                 notifyItemChanged(0)
-
                         }
                         else {
+                            Log.i(TAG, "Individual remove $index")
                             notifyItemRemoved(index)
                         }
                     }
-                    ObservableEvent.MODIFY -> notifyItemChanged(index)
+                    ObservableEvent.MODIFY -> {
+                        Log.i(TAG, "Individual modify")
+                        notifyItemChanged(index)
+                    }
                 }
             }
 
