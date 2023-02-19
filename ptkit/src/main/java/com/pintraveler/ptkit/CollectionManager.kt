@@ -2,11 +2,23 @@ package com.pintraveler.ptkit
 
 import android.util.Log
 
+data class CollectionChange<T>(
+    val event: ObservableEvent,
+    val before: T?,
+    val after: T?
+) where T: Comparable<T>
 open class CollectionManager<T>(protected val classT: Class<T>, override val TAG: String = "CollectionManager"): Observable<T>()
   where T: Comparable<T>
 {
+    private var allListeners: MutableMap<String, (List<CollectionChange<T>>) -> Unit> = mutableMapOf()
+
     //NOTE: No point synchronizing get/set as this is a reference
     var elems: MutableList<T> = mutableListOf()
+
+    fun registerAllChangeListener(name: String, listener: (List<CollectionChange<T>>) -> Unit) {
+        allListeners[name] = listener
+        listener(elems.map { CollectionChange(ObservableEvent.ADD, null, it) })
+    }
 
     open fun insertionIndexOf(v: T): Int{
         synchronized(this) {
@@ -53,7 +65,6 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
             }
         }
     }
-
 
     override fun onInternalModify(before: T, after: T) {
         synchronized(elems) {
@@ -103,6 +114,12 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
         synchronized(elems){
             elems.add(elem)
             onAdd(elem)
+        }
+    }
+
+    open fun onAllChanges(allChanged: List<CollectionChange<T>>) {
+        allListeners.forEach {
+            it.value(allChanged)
         }
     }
 }

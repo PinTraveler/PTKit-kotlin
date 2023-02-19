@@ -44,7 +44,8 @@ open class FireBindingRecyclerViewAdapter<T>(
                                       private var bindLast: ((ViewBinding) -> Unit)? = null,
                                       private var bindEmpty: ((ViewBinding) -> Unit)? = null,
                                       private var bind: ((T, Int, ViewBinding) -> Unit)? = null,
-                                      protected open val TAG: String = "RecyclerViewAdapter"): RecyclerView.Adapter<FireBindingViewHolder<T>>() where T: Comparable<T> {
+                                      protected open val TAG: String = "RecyclerViewAdapter",
+                                      private val registerIndividualChanges: Boolean = false): RecyclerView.Adapter<FireBindingViewHolder<T>>() where T: Comparable<T> {
     companion object {
         var TYPE_EMPTY = 1
         var TYPE_NORMAL = 0
@@ -65,7 +66,7 @@ open class FireBindingRecyclerViewAdapter<T>(
         get() = showFirstWhenEmpty.compareTo(false) + showLastWhenEmpty.compareTo(false) + showEmptyCard.compareTo(false)
 
     protected open val count: Int
-        get(){
+        get() {
             if(isEmpty)
                 return emptyCount
             else if(manager == null)
@@ -73,25 +74,25 @@ open class FireBindingRecyclerViewAdapter<T>(
             return showFirstCard.compareTo(false) + managerCount + showLastCard.compareTo(false)
         }
 
-    init{
+    init {
         Log.i(TAG, "Initializing...")
-        if(manager != null && contents != null){
+        if(manager != null && contents != null) {
             throw ConflictingParametersException("You cannot specify both a manager and a set of contents")
         }
         contents?.let{ elems = it }
-        manager?.registerListener(name){ eventType, before, after ->
-            var index = 0
-            if(before != null)
-                index = manager.insertionIndexOf(before)
-            else if(after != null)
-                index = manager.insertionIndexOf(after)
-
-            var maxC = if(showFirstCard) maxCount + 1 else maxCount //NOTE: Don't need to take into account showFirstWhenEmpty as we'll have managerCount 0
-            if(maxCount == 0 || index < maxC){
-                when(eventType) {
+        manager?.registerAllChangeListener(name) { changeList ->
+            if(!registerIndividualChanges && changeList.size > 3) {
+                notifyDataSetChanged()
+                return@registerAllChangeListener
+            }
+            changeList.forEach {
+                var index = if(it.after != null ) manager.insertionIndexOf(it.after) else if(it.before != null) manager.insertionIndexOf(it.before) else 0
+                val maxC = maxCount + if(showFirstCard) 1 else 0
+                if(maxCount > 0 && index >= maxC)
+                    return@forEach
+                when(it.event) {
                     ObservableEvent.ADD -> {
-                        val wasEmpty = manager.elems.size == 1
-                        if(wasEmpty){
+                        if(manager.elems.size == 1) { // was empty
                             // Handle the First Card
                             if(showFirstCard && !showFirstWhenEmpty)
                                 notifyItemInserted(0) // Add First Card
@@ -116,12 +117,9 @@ open class FireBindingRecyclerViewAdapter<T>(
                         }
                         else {
                             notifyItemInserted(index)
-
-                            // NOTE: This is only here to handle the section headers used in the Pin Traveler App
-                            if (index + 1 < managerCount)
-                                notifyItemChanged(index+1)
                         }
                     }
+
                     ObservableEvent.REMOVE -> {
                         if(managerCount == 0){ // Last Card has been removed
                             // Handle the First Card
@@ -145,15 +143,12 @@ open class FireBindingRecyclerViewAdapter<T>(
                         }
                         else {
                             notifyItemRemoved(index)
-
-                            //NOTE: This is only here to handle the section headers used in the Pin Traveler App
-                            if (index < managerCount)
-                                notifyItemChanged(index)
                         }
                     }
-                    ObservableEvent.MODIFY -> notifyItemChanged(index) // Modify cannot affect first/last card so no need to worry
+                    ObservableEvent.MODIFY -> notifyItemChanged(index)
                 }
             }
+
         }
     }
 

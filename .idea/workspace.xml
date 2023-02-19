@@ -14,6 +14,9 @@
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ptkit/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/CollectionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/CollectionManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/FilterManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/FilterManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/FireCollectionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/FireCollectionManager.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/ui/BindingHolderAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/ui/BindingHolderAdapter.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

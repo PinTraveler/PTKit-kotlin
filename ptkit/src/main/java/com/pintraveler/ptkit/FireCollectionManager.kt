@@ -7,7 +7,8 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 
 open class FireCollectionManager<T>(classT: Class<T>, protected val reference: CollectionReference,
-                                    protected var query: Query = reference, TAG: String, register: Boolean = false, private val sanityFilter: ((T) -> Boolean) = { true }):
+                                    protected var query: Query = reference, TAG: String, register: Boolean = false,
+                                    private val sanityFilter: ((T) -> Boolean) = { true }):
     CollectionManager<T>(classT, TAG) where T: FireObject {
 
     protected var collectionListener: ListenerRegistration? = null
@@ -29,24 +30,30 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
                     Log.e(TAG, "Error listening to collection!")
                 } else if (snap != null) {
                     firestoreInitialized = true
-                    var allChanged = mutableListOf<T>()
+                    var allChanged = mutableListOf<CollectionChange<T>>()
                     snap.documentChanges.forEach {
                         try {
                             val elem = it.document.toObject(classT)
                             elem._id = it.document.id
+                            val before = getByID(elem._id)
                             val modifiedElem = elemModBeforeInsertion(elem)
                             if (!sanityFilter(modifiedElem))
                                 return@forEach
 
-                            allChanged.add(modifiedElem)
                             Log.i(TAG, "ADD ${elems.size}")
                             when (it.type) {
-                                DocumentChange.Type.ADDED -> onInternalAdd(modifiedElem)
-                                DocumentChange.Type.MODIFIED -> onInternalModify(
-                                    modifiedElem,
-                                    modifiedElem
-                                )
-                                DocumentChange.Type.REMOVED -> onInternalRemove(modifiedElem)
+                                DocumentChange.Type.ADDED -> {
+                                    onInternalAdd(modifiedElem)
+                                    allChanged.add(CollectionChange(ObservableEvent.ADD, before, elem))
+                                }
+                                DocumentChange.Type.MODIFIED -> {
+                                    onInternalModify(modifiedElem, modifiedElem)
+                                    allChanged.add(CollectionChange(ObservableEvent.MODIFY, before, elem))
+                                }
+                                DocumentChange.Type.REMOVED -> {
+                                    onInternalRemove(modifiedElem)
+                                    allChanged.add(CollectionChange(ObservableEvent.REMOVE, before, null))
+                                }
                             }
                         } catch (e: Exception) {
                             Log.e(TAG, "Error parsing document ${it.document.id}! ${it.document.data}")
@@ -102,6 +109,7 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
         return elems.find{ it._id == id }
     }
 
-    open fun onAllChanges(allChanged: List<T>){}
-
+    override fun onAllChanges(allChanged: List<CollectionChange<T>>) {
+        super.onAllChanges(allChanged)
+    }
 }
