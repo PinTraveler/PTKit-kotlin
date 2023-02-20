@@ -139,11 +139,14 @@ open class FireBindingRecyclerViewAdapter<T>(
                                 notifyItemChanged(0) // change first card to first empty card
 
                             // Remove Main Card
-                            Log.i(TAG, "Individual remove -empty- $index")
-                            if(showEmptyCard)
-                                notifyItemChanged(if(showFirstWhenEmpty) 1 else 0) // change last card to empty card
-                            else
-                                notifyItemRemoved(if(showFirstWhenEmpty) 1 else 0)
+                            if(showEmptyCard) {
+                                Log.i(TAG, "Individual remove -empty change- $index")
+                                notifyItemChanged(if (showFirstWhenEmpty) 1 else 0) // change last card to empty card
+                            }
+                            else {
+                                Log.i(TAG, "Individual remove -empty change- $index")
+                                notifyItemRemoved(if (showFirstWhenEmpty) 1 else 0)
+                            }
 
                             // Handle the Last Card
                             if(showLastCard && !showLastWhenEmpty)
