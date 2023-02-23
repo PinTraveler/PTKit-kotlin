@@ -58,7 +58,7 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
                                 }
                             }
                         } catch (e: Exception) {
-                            Log.e(TAG, "Error parsing document ${it.document.id}! ${it.document.data}")
+                            Log.e(TAG, "Error parsing document ${it.document.id}! ${it.document.data}", e)
                         }
                     }
                     onAllChanges(allChanged)
