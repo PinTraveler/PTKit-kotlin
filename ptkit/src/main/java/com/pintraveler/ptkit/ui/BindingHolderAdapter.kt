@@ -131,12 +131,19 @@ open class FireBindingRecyclerViewAdapter<T>(
                     ObservableEvent.REMOVE -> {
                         if(managerCount == 0){ // Last Card has been removed
                             // Handle the First Card
-                            if(showFirstCard && !showFirstWhenEmpty) // Remove First Card
+                            Log.i(TAG, "Handling first card")
+                            if(showFirstCard && !showFirstWhenEmpty) { // Remove First Card
                                 notifyItemRemoved(0)
-                            else if(!showFirstCard && showFirstWhenEmpty) // Add First Empty Card
+                                Log.i(TAG, "First Removed")
+                            }
+                            else if(!showFirstCard && showFirstWhenEmpty) { // Add First Empty Card
                                 notifyItemInserted(0)
-                            else
+                                Log.i(TAG, "First Inserted")
+                            }
+                            else if(showFirstCard && showFirstWhenEmpty) {
                                 notifyItemChanged(0) // change first card to first empty card
+                                Log.i(TAG, "First Changed")
+                            }
 
                             // Remove Main Card
                             if(showEmptyCard) {
@@ -144,17 +151,24 @@ open class FireBindingRecyclerViewAdapter<T>(
                                 notifyItemChanged(if (showFirstWhenEmpty) 1 else 0) // change last card to empty card
                             }
                             else {
-                                Log.i(TAG, "Individual remove -empty change- $index")
+                                Log.i(TAG, "Individual remove -empty- $index")
                                 notifyItemRemoved(if (showFirstWhenEmpty) 1 else 0)
                             }
 
+                            Log.i(TAG, "Handling Last Card")
                             // Handle the Last Card
-                            if(showLastCard && !showLastWhenEmpty)
-                                notifyItemRemoved(if(showFirstWhenEmpty) 1 else 0) // Remove Last Card
-                            else if(!showLastCard && showLastWhenEmpty)
-                                notifyItemInserted(if(showFirstWhenEmpty) 1 else 0) // Add Last Empty Card
-                            else
-                                notifyItemChanged(0)
+                            if(showLastCard && !showLastWhenEmpty) {
+                                notifyItemRemoved(if (showFirstWhenEmpty) 1 else 0) // Remove Last Card
+                                Log.i(TAG, "Last Removed")
+                            }
+                            else if(!showLastCard && showLastWhenEmpty) {
+                                notifyItemInserted(if (showFirstWhenEmpty) 1 else 0) // Add Last Empty Card
+                                Log.i(TAG, "Last Inserted")
+                            }
+                            else if(showLastCard && showLastCard) {
+                                notifyItemChanged(if (showFirstWhenEmpty) 1 else 0)
+                                Log.i(TAG, "Last Changed")
+                            }
                         }
                         else {
                             Log.i(TAG, "Individual remove $index")
