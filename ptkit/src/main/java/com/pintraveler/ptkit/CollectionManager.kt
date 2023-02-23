@@ -23,19 +23,7 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
 
     open fun insertionIndexOf(v: T): Int{
         synchronized(this) {
-            var min = 0
-            var max = elems.size
-            while (min < max) {
-                var mid = (min + max) / 2
-                if (v.compareTo(elems[mid]) == 0) {
-                    return mid
-                }
-                if (v.compareTo(elems[mid]) > 0)
-                    min = mid + 1
-                else
-                    max = mid
-            }
-            return min
+            return elems.binarySearch(v)
         }
     }
 
@@ -79,6 +67,9 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
                 Log.d(TAG, "Modified: Passed the same object -- really modified ($before -> $after)")
                 elems[index] = after
                 onModify(before, after)
+            }
+            else {
+                Log.w(TAG, "Modified: Passed dfferent object -- is insertion index wrong? $before -> $after")
             }
         }
     }

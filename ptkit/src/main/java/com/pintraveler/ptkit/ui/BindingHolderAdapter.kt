@@ -90,6 +90,7 @@ open class FireBindingRecyclerViewAdapter<T>(
                 notifyDataSetChanged()
                 return@registerAllChangeListener
             }
+            Log.i(TAG, "Propagating changes individually")
             changeList.forEach {
                 var index = if(it.after != null ) manager.insertionIndexOf(it.after) else if(it.before != null) manager.insertionIndexOf(it.before) else 0
                 val maxC = maxCount + if(showFirstCard) 1 else 0
@@ -97,6 +98,9 @@ open class FireBindingRecyclerViewAdapter<T>(
                     Log.i(TAG, "Returning for maxcount as $maxCount, $index, $maxC")
                     return@forEach
                 }
+                Log.i(TAG, "Index is $index")
+                if(showFirstCard)
+                    index += 1
                 when(it.event) {
                     ObservableEvent.ADD -> {
                         if(manager.elems.size == 1) { // was empty
@@ -123,7 +127,7 @@ open class FireBindingRecyclerViewAdapter<T>(
                                 notifyItemChanged(if(showFirstCard) 2 else 1) // Replace Last Empty Card with Last Card
                         }
                         else {
-                            Log.i(TAG, "Individual insert")
+                            Log.i(TAG, "Individual insert -- $index")
                             notifyItemInserted(index)
                         }
                     }
