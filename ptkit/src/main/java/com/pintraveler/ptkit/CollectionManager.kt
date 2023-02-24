@@ -21,9 +21,14 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
         listener(elems.map { CollectionChange(ObservableEvent.ADD, null, it) })
     }
 
-    open fun insertionIndexOf(v: T): Int{
+    open fun insertionIndexOf(v: T): Int {
         synchronized(this) {
-            return elems.binarySearch(v)
+            // if element _exists_ returns index of element
+            // else returns index = (-insertionpoint - 1)
+            val index = elems.binarySearch(v)
+            if(index >= 0)
+                return index
+            return -(index + 1)
         }
     }
 
