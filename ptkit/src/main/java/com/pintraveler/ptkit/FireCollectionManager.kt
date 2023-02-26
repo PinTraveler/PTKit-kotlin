@@ -1,10 +1,7 @@
 package com.pintraveler.ptkit
 
 import android.util.Log
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 
 open class FireCollectionManager<T>(classT: Class<T>, protected val reference: CollectionReference,
                                     protected var query: Query = reference, TAG: String, register: Boolean = false,
@@ -104,6 +101,10 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
         removeAt(index, null)
     }
 
+    override fun remove(elem: T) {
+        removeByID(elem._id)
+    }
+
     open fun insert(elem: T, withID: String? = null, completion: ((Exception?) -> Unit)? = null) {
         if(withID == null)
             reference.add(elem).addOnCompleteListener { completion?.invoke(it.exception) }
@@ -111,8 +112,20 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
             reference.document(withID).set(elem).addOnCompleteListener { completion?.invoke(it.exception) }
     }
 
+    override fun insert(elem: T) {
+        insert(elem, null)
+    }
+
     open fun getByID(id: String): T? {
         return elems.find{ it._id == id }
+    }
+
+    open fun update(id: String, updates: Map<String, Any>) {
+        reference.document(id).set(updates, SetOptions.merge())
+
+    }
+    open fun update(elem: T, updates: Map<String, Any>) {
+        update(elem._id, updates)
     }
 
     override fun onAllChanges(allChanged: List<CollectionChange<T>>) {

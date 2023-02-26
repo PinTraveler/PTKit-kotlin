@@ -97,7 +97,7 @@ open class FireBindingRecyclerViewAdapter<T>(
                 if(maxCount > 0 && index >= maxC) {
                     Log.i(TAG, "Returning for maxcount as $maxCount, $index, $maxC")
                     return@forEach
-                }
+                 }
                 Log.i(TAG, "Index is $index")
                 if(showFirstCard)
                     index += 1
