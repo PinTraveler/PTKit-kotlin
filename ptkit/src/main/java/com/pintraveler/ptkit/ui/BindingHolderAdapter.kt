@@ -85,12 +85,16 @@ open class FireBindingRecyclerViewAdapter<T>(
             val change = changeList.filter { it.event == ObservableEvent.MODIFY }.size
             val remove = changeList.filter { it.event == ObservableEvent.REMOVE }.size
             Log.i(TAG, "Received ${changeList.size} $add, $change, $remove")
-            if(!registerIndividualChanges && changeList.size > 3) {
+            if(!registerIndividualChanges && changeList.isNotEmpty()) {
                 Log.i(TAG, "Doing a bulk change")
                 notifyDataSetChanged()
                 return@registerAllChangeListener
             }
             Log.i(TAG, "Propagating changes individually")
+            //TODO: This is currently disabled
+            // elems is not quite correct in the manager since potentially 3 whole changes could have happened
+            // leading to undefined behavior
+            // possible fix: propagate insertion index in all changes?
             changeList.forEach {
                 var index = if(it.after != null ) manager.insertionIndexOf(it.after) else if(it.before != null) manager.insertionIndexOf(it.before) else 0
                 val maxC = maxCount + if(showFirstCard) 1 else 0
