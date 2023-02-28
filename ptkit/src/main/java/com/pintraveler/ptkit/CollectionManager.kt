@@ -18,7 +18,9 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
 
     fun registerAllChangeListener(name: String, listener: (List<CollectionChange<T>>) -> Unit) {
         Log.i(TAG, "Registering all listener $name")
-        allListeners[UUID.randomUUID().toString()] = listener
+        if(allListeners.keys.contains(name))
+            Log.w(TAG, "Overwriting existing listener $name!")
+        allListeners[name] = listener
         listener(elems.map { CollectionChange(ObservableEvent.ADD, null, it) })
     }
 
@@ -121,6 +123,7 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
         val remove = allChanged.filter { it.event == ObservableEvent.REMOVE }.size
         Log.i(TAG, "All Changes: ${allChanged.size} changes $add, $change, $remove")
         allListeners.forEach {
+            Log.i(TAG, "Notifying listener ${it.key}")
             it.value(allChanged)
         }
     }
