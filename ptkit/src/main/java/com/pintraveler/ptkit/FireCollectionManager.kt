@@ -24,7 +24,7 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
         synchronized(this) {
             collectionListener = query.addSnapshotListener { snap, err ->
                 if (err != null) {
-                    Log.e(TAG, "Error listening to collection!")
+                    Log.e(TAG, "Error listening to collection!", err)
                 } else if (snap != null) {
                     firestoreInitialized = true
                     var allChanged = mutableListOf<CollectionChange<T>>()
@@ -122,8 +122,8 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
 
     open fun update(id: String, updates: Map<String, Any>) {
         reference.document(id).set(updates, SetOptions.merge())
-
     }
+
     open fun update(elem: T, updates: Map<String, Any>) {
         update(elem._id, updates)
     }

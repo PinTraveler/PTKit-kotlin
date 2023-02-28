@@ -1,6 +1,7 @@
 package com.pintraveler.ptkit
 
 import android.util.Log
+import java.util.UUID
 
 data class CollectionChange<T>(
     val event: ObservableEvent,
@@ -17,7 +18,7 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
 
     fun registerAllChangeListener(name: String, listener: (List<CollectionChange<T>>) -> Unit) {
         Log.i(TAG, "Registering all listener $name")
-        allListeners[name] = listener
+        allListeners[UUID.randomUUID().toString()] = listener
         listener(elems.map { CollectionChange(ObservableEvent.ADD, null, it) })
     }
 

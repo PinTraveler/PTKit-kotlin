@@ -10,17 +10,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6ba29558-19f2-4c64-aaf6-5a16513b80b8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/ui/NestedBindingHolderAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ptkit/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/ui/BindingHolderAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/ui/BindingHolderAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/CollectionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/CollectionManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/FireCollectionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/FireCollectionManager.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[959XS0TGR]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[23091FDF6001E8]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
