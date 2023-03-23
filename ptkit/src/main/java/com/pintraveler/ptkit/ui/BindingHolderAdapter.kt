@@ -40,10 +40,10 @@ open class FireBindingRecyclerViewAdapter<T>(
                                       private val showLastCard: Boolean = false,
                                       private val showLastWhenEmpty: Boolean = false,
                                       protected var onLongClick: ((T, Int) -> Unit)? = null,
-                                      private var bindFirst: ((ViewBinding) -> Unit)? = null,
-                                      private var bindLast: ((ViewBinding) -> Unit)? = null,
-                                      private var bindEmpty: ((ViewBinding) -> Unit)? = null,
-                                      private var bind: ((T, Int, ViewBinding) -> Unit)? = null,
+                                      open var bindFirst: ((ViewBinding) -> Unit)? = null,
+                                      open var bindLast: ((ViewBinding) -> Unit)? = null,
+                                      open var bindEmpty: ((ViewBinding) -> Unit)? = null,
+                                      open var bind: ((T, Int, ViewBinding) -> Unit)? = null,
                                       protected open val TAG: String = "RecyclerViewAdapter",
                                       private val registerIndividualChanges: Boolean = false): RecyclerView.Adapter<FireBindingViewHolder<T>>() where T: Comparable<T> {
     companion object {

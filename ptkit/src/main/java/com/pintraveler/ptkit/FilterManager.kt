@@ -48,6 +48,7 @@ class FilterManager<T>(classT: Class<T>, private val manager: CollectionManager<
     }
 
     open fun changeFilter(newFilterFn: ((T) -> Boolean)){
+        Log.i(TAG, "changing filter")
         filterFn = newFilterFn
         var allChanged = mutableListOf<CollectionChange<T>>()
         elems.toList().forEach {
