@@ -10,11 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6ba29558-19f2-4c64-aaf6-5a16513b80b8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ptkit/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/FilterManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/FilterManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/ui/BindingHolderAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/ptkit/src/main/java/com/pintraveler/ptkit/ui/BindingHolderAdapter.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

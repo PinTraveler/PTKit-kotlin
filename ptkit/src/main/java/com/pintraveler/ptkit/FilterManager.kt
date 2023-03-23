@@ -69,4 +69,8 @@ class FilterManager<T>(classT: Class<T>, private val manager: CollectionManager<
         if(allChanged.isNotEmpty())
             onAllChanges(allChanged)
     }
+
+    override fun remove(elem: T) {
+        manager.remove(elem)
+    }
 }
