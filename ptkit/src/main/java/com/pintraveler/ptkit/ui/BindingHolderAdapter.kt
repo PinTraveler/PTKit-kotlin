@@ -28,6 +28,8 @@ open class FireBindingViewHolder<T>(private val binding: ViewBinding,
 open class FireBindingRecyclerViewAdapter<T>(
                                       private val createViewBinding: (ViewGroup) -> ViewBinding,
                                       private val createEmptyViewBinding: ((ViewGroup) -> ViewBinding)? = null,
+                                      private val createFirstViewBinding: ((ViewGroup) -> ViewBinding)? = null,
+                                      private val createLastViewBinding: ((ViewGroup) -> ViewBinding)? = null,
                                       protected val manager: CollectionManager<T>? = null,
                                       name: String = "PTRecyclerViewAdapter",
                                       contents: List<T>? = null,
@@ -47,9 +49,12 @@ open class FireBindingRecyclerViewAdapter<T>(
                                       protected open val TAG: String = "RecyclerViewAdapter",
                                       private val registerIndividualChanges: Boolean = false): RecyclerView.Adapter<FireBindingViewHolder<T>>() where T: Comparable<T> {
     companion object {
+        var TYPE_LAST = 3
+        var TYPE_FIRST = 2
         var TYPE_EMPTY = 1
         var TYPE_NORMAL = 0
     }
+
     var elems: List<T> = listOf()
         set(value){
             field = value
@@ -260,19 +265,33 @@ open class FireBindingRecyclerViewAdapter<T>(
     }
 
     override fun getItemViewType(position: Int): Int {
-        if(!isEmpty) {
-            return TYPE_NORMAL
-        }
-        if((position == 0 && showEmptyCard && !showFirstWhenEmpty) || (position == 1 && showEmptyCard && showFirstWhenEmpty)) {
+        if(isEmpty) {
+            if(position == 0 && showFirstWhenEmpty)
+                return TYPE_FIRST
+            if(position == 0 && !showFirstWhenEmpty && showEmptyCard)
+                return TYPE_EMPTY
+            if(position == (getItemCount() - 1) && showLastWhenEmpty)
+                return TYPE_LAST
             return TYPE_EMPTY
         }
+        if(position == 0 && showFirstCard)
+            return TYPE_FIRST
+        if(position == (getItemCount() - 1) && showLastCard)
+            return TYPE_LAST
         return TYPE_NORMAL
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireBindingViewHolder<T> {
         Log.i(TAG, "On Create VH")
-        val emptyFN = createEmptyViewBinding ?: createViewBinding
-        val binding = if(viewType == TYPE_EMPTY && createEmptyViewBinding != null) emptyFN(parent) else createViewBinding(parent)
+        var binding: ViewBinding? = null
+        if(viewType == TYPE_EMPTY && createEmptyViewBinding != null)
+            binding = createEmptyViewBinding!!(parent)
+        else if(viewType == TYPE_FIRST && createFirstViewBinding != null)
+            binding = createFirstViewBinding!!(parent)
+        else if(viewType == TYPE_LAST && createLastViewBinding != null)
+            binding = createLastViewBinding!!(parent)
+        else
+            binding = createViewBinding(parent)
         return FireBindingViewHolder(binding, bind, bindFirst, bindLast, bindEmpty)
     }
 
