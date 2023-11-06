@@ -24,6 +24,11 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
         listener(elems.map { CollectionChange(ObservableEvent.ADD, null, it) })
     }
 
+    fun removeAllChangeListener(name: String) {
+        Log.i(TAG, "Removing all listener $name")
+        allListeners.remove(name)
+    }
+
     open fun insertionIndexOf(v: T): Int {
         synchronized(this) {
             // if element _exists_ returns index of element
@@ -123,8 +128,13 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
         val remove = allChanged.filter { it.event == ObservableEvent.REMOVE }.size
         Log.i(TAG, "All Changes: ${allChanged.size} changes $add, $change, $remove")
         allListeners.forEach {
-            Log.i(TAG, "Notifying listener ${it.key}")
-            it.value(allChanged)
+            try {
+                Log.i(TAG, "Notifying listener ${it.key}")
+                it.value(allChanged)
+            }
+            catch (e: Exception) {
+                Log.e(TAG, "Error notifying listener ${it.key} $e")
+            }
         }
     }
 }
