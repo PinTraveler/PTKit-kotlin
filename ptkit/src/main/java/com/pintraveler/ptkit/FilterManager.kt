@@ -2,7 +2,7 @@ package com.pintraveler.ptkit
 
 import android.util.Log
 
-open class FilterManager<T>(classT: Class<T>, private val manager: CollectionManager<T>, val name: String, val limit:Int = 0, var filterFn: ((T) -> Boolean)):
+open class FilterManager<T>(classT: Class<T>, protected val manager: CollectionManager<T>, val name: String, val limit:Int = 0, var filterFn: ((T) -> Boolean)):
     CollectionManager<T>(classT) where T: Comparable<T>{
     override val TAG = "FilterManager$name"
     init {
