@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 
 open class FireCollectionManager<T>(classT: Class<T>, protected val reference: CollectionReference,
                                     protected var query: Query = reference, TAG: String, register: Boolean = false,
@@ -86,6 +87,7 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
     fun deregisterFirestoreListener(){
         synchronized(this){
             collectionListener?.remove()
+
             collectionListener = null
         }
     }
@@ -134,8 +136,10 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
         insert(elem, null)
     }
 
-    open fun getByID(id: String): T? {
-        return elems.find{ it._id == id }
+    open suspend fun getByID(id: String): T? {
+        dataMutex.withLock {
+            return elems.find { it._id == id }
+        }
     }
 
     open fun update(id: String, updates: Map<String, Any>) {
