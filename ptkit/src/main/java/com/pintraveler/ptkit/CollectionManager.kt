@@ -1,6 +1,7 @@
 package com.pintraveler.ptkit
 
 import android.util.Log
+import kotlinx.coroutines.sync.withLock
 import java.util.UUID
 
 data class CollectionChange<T>(
@@ -30,60 +31,70 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
     }
 
     open fun insertionIndexOf(v: T): Int {
-        synchronized(this) {
-            // if element _exists_ returns index of element
-            // else returns index = (-insertionpoint - 1)
-            val index = elems.binarySearch(v)
-            if(index >= 0)
-                return index
-            return -(index + 1)
-        }
+        // if element _exists_ returns index of element
+        // else returns index = (-insertionpoint - 1)
+        val index = elems.binarySearch(v)
+        if(index >= 0)
+            return index
+        return -(index + 1)
     }
 
     override fun onRegister(listener: (ObservableEvent, T?, T?) -> Unit) {
         elems.forEach { synchronized(elems){ listener(ObservableEvent.ADD, null, it) } }
     }
 
-    override fun onInternalAdd(elem: T) {
+    suspend fun onInternalAddNoLock(elem: T) {
         val index = insertionIndexOf(elem)
-        synchronized(elems) {
-            if (index < elems.size && elems[index].compareTo(elem) == 0) {
-                Log.w(TAG, "InternalAdd: Element $elem already exists, ignoring.")
-                return
-            }
-            Log.d(TAG, "Add $elem")
-            this.elems.add(index, elem)
-            onAdd(elem)
+        if (index < elems.size && elems[index].compareTo(elem) == 0) {
+            Log.w(TAG, "InternalAdd: Element $elem already exists, ignoring.")
+            return
+        }
+        Log.d(TAG, "Add $elem")
+        this.elems.add(index, elem)
+        onAdd(elem)
+
+    }
+
+    suspend fun onInternalRemoveNoLock(elem: T) {
+        val index = insertionIndexOf(elem)
+        if (index < elems.size && elems[index].compareTo(elem) == 0) {
+            Log.d(TAG, "Remove $elem")
+            elems.removeAt(index)
+            onRemove(elem)
         }
     }
 
-    override fun onInternalRemove(elem: T){
-        synchronized(elems){
-            val index = insertionIndexOf(elem)
-            if (index < elems.size && elems[index].compareTo(elem) == 0) {
-                Log.d(TAG, "Remove $elem")
-                elems.removeAt(index)
-                onRemove(elem)
-            }
+    suspend fun onInternalModifyNoLock(before: T, after: T) {
+        val index = insertionIndexOf(after)
+        if (index >= elems.size) {
+            Log.d(TAG, "Add (mod) $after")
+            elems.add(index, after)
+            onAdd(after)
+        }
+        if (before.compareTo(after) == 0) {
+            Log.d(TAG, "Modified: Passed the same object -- really modified ($before -> $after)")
+            elems[index] = after
+            onModify(before, after)
+        } else {
+            Log.w(TAG, "Modified: Passed dfferent object -- is insertion index wrong? $before -> $after"
+            )
+        }
+    }
+    override suspend fun onInternalAdd(elem: T) {
+        dataMutex.withLock {
+            onInternalAddNoLock(elem)
         }
     }
 
-    override fun onInternalModify(before: T, after: T) {
-        synchronized(elems) {
-            val index = insertionIndexOf(after)
-            if (index >= elems.size) {
-                Log.d(TAG, "Add (mod) $after")
-                elems.add(index, after)
-                onAdd(after)
-            }
-            if (before.compareTo(after) == 0){
-                Log.d(TAG, "Modified: Passed the same object -- really modified ($before -> $after)")
-                elems[index] = after
-                onModify(before, after)
-            }
-            else {
-                Log.w(TAG, "Modified: Passed dfferent object -- is insertion index wrong? $before -> $after")
-            }
+    override suspend fun onInternalRemove(elem: T){
+        dataMutex.withLock {
+            onInternalRemoveNoLock(elem)
+        }
+    }
+
+    override suspend fun onInternalModify(before: T, after: T) {
+        dataMutex.withLock {
+            onInternalModifyNoLock(before, after)
         }
     }
 
@@ -92,31 +103,31 @@ open class CollectionManager<T>(protected val classT: Class<T>, override val TAG
         elems = mutableListOf()
     }
 
-    open fun removeAt(index: Int){
-        Log.i(TAG, "REMOVING AT -4- ${index}")
-        synchronized(elems) {
+    open suspend fun removeAt(index: Int){
+        dataMutex.withLock {
+            Log.i(TAG, "REMOVING AT -4- ${index}")
             val elem = elems[index]
             elems.removeAt(index)
             onRemove(elem)
         }
     }
 
-    open fun remove(elem: T){
-        synchronized(elems) {
+    open suspend fun remove(elem: T){
+        dataMutex.withLock {
             elems.remove(elem)
             onRemove(elem)
         }
     }
 
-    open fun insertAt(index: Int, elem: T){
-        synchronized(elems) {
+    open suspend fun insertAt(index: Int, elem: T){
+        dataMutex.withLock {
             elems.add(index, elem)
             onAdd(elem)
         }
     }
 
-    open fun insert(elem: T){
-        synchronized(elems){
+    open suspend fun insert(elem: T){
+        dataMutex.withLock {
             elems.add(elem)
             onAdd(elem)
         }

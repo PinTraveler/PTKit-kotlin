@@ -1,7 +1,10 @@
 package com.pintraveler.ptkit
 
+import android.provider.Settings.Global
 import android.util.Log
 import com.google.firebase.firestore.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 open class FireCollectionManager<T>(classT: Class<T>, protected val reference: CollectionReference,
                                     protected var query: Query = reference, TAG: String, register: Boolean = false,
@@ -20,49 +23,64 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
         return elem
     }
 
-    fun registerFirestoreListener() {
-        synchronized(this) {
-            collectionListener = query.addSnapshotListener { snap, err ->
-                if (err != null) {
-                    Log.e(TAG, "Error listening to collection!", err)
-                } else if (snap != null) {
-                    firestoreInitialized = true
-                    var allChanged = mutableListOf<CollectionChange<T>>()
-                    snap.documentChanges.forEach {
-                        try {
-                            val elem = it.document.toObject(classT)
-                            elem._id = it.document.id
-                            val before = getByID(elem._id)
-                            val modifiedElem = elemModBeforeInsertion(elem)
-                            if (!sanityFilter(modifiedElem))
-                                return@forEach
-
-                            Log.i(TAG, "ADD ${elems.size}")
-                            when (it.type) {
-                                DocumentChange.Type.ADDED -> {
-                                    onInternalAdd(modifiedElem)
-                                    allChanged.add(CollectionChange(ObservableEvent.ADD, before, elem))
-                                }
-                                DocumentChange.Type.MODIFIED -> {
-                                    if(before == null)
-                                        Log.w(TAG, "BEFORE IS NULL for after $modifiedElem")
-                                    onInternalModify(before ?: modifiedElem, modifiedElem)
-                                    allChanged.add(CollectionChange(ObservableEvent.MODIFY, before, elem))
-                                }
-                                DocumentChange.Type.REMOVED -> {
-                                    onInternalRemove(modifiedElem)
-                                    allChanged.add(CollectionChange(ObservableEvent.REMOVE, before, null))
-                                }
-                            }
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Error parsing document ${it.document.id}! ${it.document.data}", e)
-                        }
-                    }
-                    onAllChanges(allChanged)
-                }
-            }
-            initialized = true
+    suspend fun onDocumentChange(doc: DocumentChange): CollectionChange<T>? {
+        val elem = doc.document.toObject(classT)
+        elem._id = doc.document.id
+        val before = getByID(elem._id)
+        val modifiedElem = elemModBeforeInsertion(elem)
+        if (!sanityFilter(modifiedElem)) {
+            Log.w(TAG, "Sanity filter failed for $modifiedElem")
+            return null
         }
+
+        Log.i(TAG, "ADD ${elems.size}")
+        when (doc.type) {
+            DocumentChange.Type.ADDED -> {
+                onInternalAddNoLock(modifiedElem)
+                return CollectionChange(ObservableEvent.ADD, before, elem)
+            }
+            DocumentChange.Type.MODIFIED -> {
+                if(before == null)
+                    Log.w(TAG, "BEFORE IS NULL for after $modifiedElem")
+                onInternalModifyNoLock(before ?: modifiedElem, modifiedElem)
+                return CollectionChange(ObservableEvent.MODIFY, before, elem)
+            }
+            DocumentChange.Type.REMOVED -> {
+                onInternalRemoveNoLock(modifiedElem)
+                return CollectionChange(ObservableEvent.REMOVE, before, null)
+            }
+        }
+    }
+
+    fun registerFirestoreListener() {
+        collectionListener = query.addSnapshotListener { snap, err ->
+            firestoreInitialized = true
+            if (err != null) {
+                Log.e(TAG, "Error listening to collection!", err)
+                return@addSnapshotListener
+            } else if (snap == null) {
+                Log.e(TAG, "Null snapshot!")
+                return@addSnapshotListener
+            }
+            val allChanged = mutableListOf<CollectionChange<T>>()
+            GlobalScope.launch {//NOTE: RISKY. I DONT KNOW WHAT IM DOING HERE
+                snap.documentChanges.forEach {
+                    try {
+                        val change = onDocumentChange(it)
+                        if (change != null)
+                            allChanged.add(change)
+                    } catch (e: Exception) {
+                        Log.e(
+                            TAG,
+                            "Error parsing document ${it.document.id}! ${it.document.data}",
+                            e
+                        )
+                    }
+                }
+                onAllChanges(allChanged)
+            }
+        }
+        initialized = true
     }
 
     fun deregisterFirestoreListener(){
@@ -75,7 +93,7 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
     override fun clean() {
         super.clean()
         deregisterFirestoreListener()
-        synchronized(elems){
+        GlobalScope.launch {
             elems.forEach {
                 elems.remove(it)
                 onRemove(it)
@@ -97,11 +115,11 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
     }
 
     // metamorphism.
-    override fun removeAt(index: Int) {
+    override suspend fun removeAt(index: Int) {
         removeAt(index, null)
     }
 
-    override fun remove(elem: T) {
+    override suspend fun remove(elem: T) {
         removeByID(elem._id)
     }
 
@@ -112,7 +130,7 @@ open class FireCollectionManager<T>(classT: Class<T>, protected val reference: C
             reference.document(withID).set(elem).addOnCompleteListener { completion?.invoke(it.exception) }
     }
 
-    override fun insert(elem: T) {
+    override suspend fun insert(elem: T) {
         insert(elem, null)
     }
 
