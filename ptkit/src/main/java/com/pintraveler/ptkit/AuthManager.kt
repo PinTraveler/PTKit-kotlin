@@ -21,21 +21,6 @@ open class AuthManager: Observable<AuthState>() {
 
     override fun getObservableValue(): AuthState { return state }
 
-    fun startAuthListener() {
-        Log.d(TAG, "Auth Listener Starting...")
-        FirebaseAuth.getInstance().addAuthStateListener { auth ->
-            val lastState = state
-            if(auth.currentUser != null){
-                state = AuthState.AUTHENTICATED
-            }
-            else {
-                state = AuthState.UNAUTHENTICATED
-            }
-            Log.d(TAG, "Auth Stage Changed from $lastState to $state")
-            onModify(lastState, state)
-            initialized = true
-        }
-    }
 
     fun validateEmail(email: String, completion: (String) -> Unit){
         if(email == "")

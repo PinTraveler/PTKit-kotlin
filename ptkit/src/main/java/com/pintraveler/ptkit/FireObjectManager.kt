@@ -4,17 +4,14 @@ import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
-open class FireObjectManager<T>(protected val classT: Class<T>?, protected val reference: DocumentReference, register: Boolean = false,
+open class FireObjectManager<T>(protected val classT: Class<T>?, protected val reference: DocumentReference,
                                 override val TAG: String = "ObjectManager"): Observable<T?>() where T: FireObject {
     var data: T? = null
 
     private var firestoreListener: ListenerRegistration? = null
-
-    init {
-        if(register)
-            registerFirestoreListener()
-    }
 
     override fun getObservableValue(): T? { synchronized(this){ return data } }
 
@@ -22,33 +19,33 @@ open class FireObjectManager<T>(protected val classT: Class<T>?, protected val r
         return elem
     }
 
-    fun registerFirestoreListener(){
-        synchronized(this) {
+    suspend fun registerFirestoreListener() {
             firestoreListener = reference.addSnapshotListener { snapshot, err ->
-                if (err != null) {
-                    Log.e(TAG, "Error listening to document.", err)
-                    return@addSnapshotListener
-                }
-                if (snapshot == null) {
-                    Log.w(TAG, "Null snapshot")
-                    return@addSnapshotListener
-                }
-                if(classT == null){
+                GlobalScope.launch {
+                    if (err != null) {
+                        Log.e(TAG, "Error listening to document.", err)
+                        return@launch
+                    }
+                    if (snapshot == null) {
+                        Log.w(TAG, "Null snapshot")
+                        return@launch
+                    }
+                    if (classT == null) {
+                        initialized = true
+                        onInternalModify(null, null)
+                        return@launch
+                    }
+
+                    val oldData = data
+                    data = snapshot.toObject(classT)
                     initialized = true
-                    onInternalModify(null, null)
-                    return@addSnapshotListener
+                    var modifiedElem: T? = null
+                    data?.let { modifiedElem = elemModBeforeInsertion(it) }
+
+                    onInternalModify(oldData, modifiedElem)
+                    //NOTE: The line above is also synchronized but this is not an issue as the sync block of this function
+                    //      completes before a callback is invoked
                 }
-
-                val oldData = data
-                data = snapshot.toObject(classT)
-                initialized = true
-                var modifiedElem: T? = null
-                data?.let{ modifiedElem = elemModBeforeInsertion(it) }
-
-                onInternalModify(oldData, modifiedElem)
-                //NOTE: The line above is also synchronized but this is not an issue as the sync block of this function
-                //      completes before a callback is invoked
-            }
         }
     }
 
